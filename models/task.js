@@ -8,7 +8,7 @@ const taskSchema = new Schema({
     priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
     status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Pending' },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
+    assignedTo: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 }, { timestamps: true });
 
