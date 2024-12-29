@@ -32,9 +32,9 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 // Method to generate JWT
 userSchema.methods.generateAuthToken = function () {
     const token = jwt.sign(
-        { _id: this._id, email: this.email, role: this.role },
+        { id: this._id, email: this.email, role: this.role },
         process.env.JWT_SECRET_KEY,
-        { expiresIn: '1h' } // Token expires in 1 hour
+        { expiresIn: '2h' } // Token expires in 1 hour
     );
     return token;
 };

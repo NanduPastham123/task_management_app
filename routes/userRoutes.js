@@ -1,12 +1,15 @@
 import express from 'express';
-import userControllers from '../controllers/userController.js';
-import proctected from '../middleware/authMiddleware.js';
-import { validateUserRegistration, validateUserLogin } from '../middleware/validateUser.js';
+import { generateTokenForLoggedInUser, getAllUsersWithPagination, getAllUsers, createNewRegistrationForUser } from '../controllers/userController.js';
+import proctected from '../middlewares/authMiddleware.js';
+import { validateUserRegistration, validateUserLogin } from '../middlewares/validateUser.js';
+import { authorize } from '../middlewares/authorize.js';
 
-console.log(` => ComesTouserRoutes`)
+
 const router = express.Router();
-router.post('/createNewRegistrationForUser', validateUserRegistration, userControllers.createNewRegistrationForUser);
-router.get('/getUsers', proctected.authenticate, userControllers.getUsers);
-router.post('/createTokenForLoggedInUser', proctected.authenticate, validateUserLogin, userControllers.createTokenForLoggedInUser);
+router.post('/createNewRegistrationForUser', validateUserRegistration, createNewRegistrationForUser);
+router.get('/getAllUsers', proctected.authenticate, authorize('admin'), getAllUsers);
+router.get('/getAllUsersWithPagination', getAllUsersWithPagination);
+router.post('/generateTokenForLoggedInUser', validateUserLogin, generateTokenForLoggedInUser);
+
 
 export default router;

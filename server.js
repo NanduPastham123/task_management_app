@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import rateLimiter from './middleware/rateLimiter.js';
-import { deduplicator, cleanupDedupKey } from './middleware/deduplicator.js';
-import errorHandler from './middleware/errorHandler.js'
+import rateLimiter from './middlewares/rateLimiter.js';
+import { deduplicator, cleanupDedupKey } from './middlewares/deduplicator.js';
+import errorHandler from './middlewares/errorHandler.js'
 import express, { json } from 'express';
 import taskRoutes from './routes/taskRoutes.js';
 import userRoutes from './routes/userRoutes.js';
