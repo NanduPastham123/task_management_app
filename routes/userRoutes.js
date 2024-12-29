@@ -1,9 +1,12 @@
-import { Router } from 'express';
-import { createUser, getUsers } from '../controllers/userController.js';
+import express from 'express';
+import userControllers from '../controllers/userController.js';
 import proctected from '../middleware/authMiddleware.js';
-const router = Router();
+import { validateUserRegistration, validateUserLogin } from '../middleware/validateUser.js';
 
-router.post('/', createUser);
-router.get('/', proctected.authenticate, getUsers);
+console.log(` => ComesTouserRoutes`)
+const router = express.Router();
+router.post('/createNewRegistrationForUser', validateUserRegistration, userControllers.createNewRegistrationForUser);
+router.get('/getUsers', proctected.authenticate, userControllers.getUsers);
+router.post('/createTokenForLoggedInUser', proctected.authenticate, validateUserLogin, userControllers.createTokenForLoggedInUser);
 
 export default router;
