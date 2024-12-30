@@ -8,7 +8,7 @@ import { authorize } from '../middlewares/authorize.js';
 const router = express.Router();
 router.post('/createNewRegistrationForUser', validateUserRegistration, createNewRegistrationForUser);
 router.get('/getAllUsers', proctected.authenticate, authorize('admin'), getAllUsers);
-router.get('/getAllUsersWithPagination', getAllUsersWithPagination);
+router.get('/getAllUsersWithPagination',proctected.authenticate,authorize('admin'), getAllUsersWithPagination);
 router.post('/generateTokenForLoggedInUser', validateUserLogin, generateTokenForLoggedInUser);
 
 

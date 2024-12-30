@@ -18,7 +18,9 @@ export const validateUserRegistration = [
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array()[0] });
+            let error = JSON.parse(JSON.stringify(errors.array()[0]));
+            console.log("eeeee::" + error['msg']);
+            return res.status(400).json({ errors: error['msg'] });
         }
         next();
     }
@@ -39,7 +41,9 @@ export const validateUserLogin = [
         console.log("comesAtvalidateloginUser")
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            let error = JSON.parse(JSON.stringify(errors.array()[0]));
+            console.log("eeeee::" + error['msg']);
+            return res.status(400).json({ errors: error['msg'] });
         }
         next();
     }

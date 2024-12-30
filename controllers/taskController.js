@@ -1,47 +1,72 @@
 import Task from '../models/task.js';  // Import Task as the default export
-import Comment from '../models/comment.js';
+import logger from '../utils/logger.js';
+import { AppError, errorHandler } from  '../middlewares/errorHandler.js';
 
-export const createNewTask = async (req, res) => {
+export const createNewUserTask = async (req, res) => {
     try {
+        // Extract data from the request body
         const { title, description, dueDate, priority, status, assignedTo } = req.body;
         let assigned = assignedTo || null;
+
+        // Log task creation attempt
+        logger.info(`Creating a new task - Title: ${title}, Assigned To: ${assignedTo}`);
+
+        // Create the task
         const task = new Task({
             title,
             description,
             dueDate,
             priority,
             status,
-            createdBy: req.user.id, // get logged-in user's ID from auth middleware
+            createdBy: req.user.id,  // Get logged-in user's ID from auth middleware
             assigned
         });
 
+        // Save the task to the database
         await task.save();
+
+        // Log task creation success
+        logger.info(`Task created successfully - Task ID: ${task._id}`);
+
+        // Respond with success message
         res.status(201).json({ message: 'Task created successfully', task });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        // Log the error with details
+        logger.error(`Error creating task: ${error.message}`);
+
+        // Respond with server error
+        return next(new AppError('Internal server Error', 500));
     }
 };
 
 export const getAllTasks = async (req, res) => {
     try {
-        const tasks = await Task.find().lean()
+        logger.info('Fetching all tasks');  // Log when the request to fetch all tasks is made
+
+        const tasks = await Task.find().lean();
+
+        logger.info(`Successfully fetched ${tasks.length} tasks`);  // Log the number of tasks retrieved
+
         res.status(200).json(tasks);
     } catch (err) {
-        console.log("error: " + err.message)
-        res.status(500).json({ message: 'Server error' });
+        logger.error(`Error fetching tasks: ${err.message}`);  // Log the error with message
+        return next(new AppError('Internal server Error', 500));
     }
-}
+};
 
 export const getAllTasksWithPagination = async (req, res) => {
     try {
-        console.log('comeshere')
         const { page = 1, limit = 10 } = req.query;
-        const tasks = await Task.find().lean()
-            .skip((page - 1) * limit)  // Skip users based on page number
-            .limit(Number(limit));     // Limit the number of users per page
+        logger.info(`Fetching tasks with pagination - Page: ${page}, Limit: ${limit}`);  // Log pagination details
+
+        const tasks = await Task.find()
+            .skip((page - 1) * limit)  // Skip tasks based on page number
+            .limit(Number(limit));     // Limit the number of tasks per page
 
         const totalTasks = await Task.countDocuments();  // Get total count for pagination
+
+        logger.info(`Successfully fetched ${tasks.length} tasks for page ${page}`);  // Log the number of tasks fetched
+
         res.status(200).json({
             tasks,
             totalTasks,
@@ -49,19 +74,26 @@ export const getAllTasksWithPagination = async (req, res) => {
             currentPage: page
         });
     } catch (err) {
-        console.log("error: " + err.message)
-        res.status(500).json({ message: 'Internal Server error' });
+        logger.error(`Error fetching tasks with pagination: ${err.message}`);  // Log error with message
+        return next(new AppError('Internal server Error', 500));
     }
-}
+};
 
 
 export const updateTask = async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description, dueDate, priority, status } = req.body;
-        const task = await Task.findById(id);
-        if (!task) return res.status(404).json({ message: 'Task not found' });
 
+        logger.info(`Attempting to update task with ID: ${id}`);  // Log the task update attempt
+
+        const task = await Task.findById(id);
+        if (!task) {
+            logger.warn(`Task not found with ID: ${id}`);  // Log when task is not found
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        // Update task fields
         task.title = title || task.title;
         task.description = description || task.description;
         task.dueDate = dueDate || task.dueDate;
@@ -69,21 +101,36 @@ export const updateTask = async (req, res) => {
         task.status = status || task.status;
 
         await task.save();
+
+        logger.info(`Task updated successfully - Task ID: ${id}`);  // Log task update success
+
         res.status(200).json({ message: 'Task updated successfully', task });
     } catch (err) {
-        res.status(500).json({ message: 'Server error' });
+        logger.error(`Error updating task: ${err.message}`);  // Log the error
+        return next(new AppError('Internal server Error', 500));
     }
-}
+};
 
 export const deleteTask = async (req, res) => {
     try {
-        const task = await Task.findByIdAndDelete(req.params.id);  // Use Task.findByIdAndDelete()
-        if (!task) return res.status(404).json({ message: 'Task not found' });
+        const { id } = req.params;
+
+        logger.info(`Attempting to delete task with ID: ${id}`);  // Log the task delete attempt
+
+        const task = await Task.findByIdAndDelete(id);
+        if (!task) {
+            logger.warn(`Task not found with ID: ${id}`);  // Log when task is not found
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        logger.info(`Task deleted successfully - Task ID: ${id}`);  // Log task deletion success
+
         res.status(200).json({ message: 'Task deleted successfully' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        logger.error(`Error deleting task: ${err.message}`);  // Log the error
+        return next(new AppError('Internal server Error', 500));
     }
-}
+};
 
 
 export const getTasksWithCommentsById = async (req, res) => {
@@ -91,25 +138,21 @@ export const getTasksWithCommentsById = async (req, res) => {
         const { id } = req.params;
         const { page = 1, limit = 5 } = req.query; // Default to page 1, 5 comments per page
 
-        // Fetch the task
-        const task = await Task.findById(id)
-            .populate('comments'); // Populate the comments
-        console.log("TASKS:::", task)
+        logger.info(`Fetching task with ID: ${id} and comments (Page: ${page}, Limit: ${limit})`);  // Log the task fetch attempt
 
-        if (!task) return res.status(404).json({ message: 'Task not found' });
+        const task = await Task.findById(id).populate('comments');
+        if (!task) {
+            logger.warn(`Task not found with ID: ${id}`);  // Log when task is not found
+            return next(new AppError('Task not found', 404));
+        }
 
-        // Apply pagination to comments
         const totalComments = task.comments.length; // Total number of comments
-        console.log("LengthOfComments::" + totalComments)
         const totalPages = Math.ceil(totalComments / limit);
-        console.log("TotalPages:" + totalPages)
-        let transform = (page - 1) * limit;
-        console.log("transform:" + transform)
-        // Paginate comments
-        const paginatedComments = task.comments.slice(transform, page * limit);
-        console.log('PaginatedComments:' + paginatedComments)
+        let transform = (page - 1) * limit;  // Calculate comment offset
+        const paginatedComments = task.comments.slice(transform, page * limit);  // Paginate comments
 
-        // Return paginated data
+        logger.info(`Successfully fetched task with ID: ${id}. Total comments: ${totalComments}. Total pages: ${totalPages}`);  // Log success
+
         res.status(200).json({
             task: {
                 ...task.toObject(),
@@ -123,7 +166,7 @@ export const getTasksWithCommentsById = async (req, res) => {
             },
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
+        logger.error(`Error fetching task with comments: ${err.message}`);  // Log the error
+        return next(new AppError('Internal server Error', 500));
     }
 };
