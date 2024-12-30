@@ -4,8 +4,8 @@ import User from '../models/user.js';
 
 /**
  * This is middleware function to authenticate user based on the JWT token and return the true if valid
- * @param {*} request
- * @param {*} response
+ * @param {*} req
+ * @param {*} res
  * @returns [] 401 if invalid otherwise pass to API handler
  */
 // Middleware to authenticate user based on JWT

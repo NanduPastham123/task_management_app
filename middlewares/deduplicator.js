@@ -2,13 +2,25 @@ import logger from '../utils/logger.js';  // Assuming your logger is set up prop
 import { LRUCache } from 'lru-cache';
 import { AppError } from '../middlewares/errorHandler.js';
 
-// Create an LRU cache for deduplication
+/**
+ * implemented an LRU cache for deduplication
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns [] 401 if invalid otherwise pass to API handler
+ */
 const deduplicationCache = new LRUCache({
     max: 500, // Maximum number of deduplication keys
     ttl: 60 * 1000, // Time-to-live for deduplication keys (in ms)
 });
 
-// Middleware for deduplication
+/**
+ * This is middleware function for deduplication of request from twice with same records
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns [] 401 if invalid otherwise pass to API handler
+ */
 export const deduplicator = async (req, res, next) => {
     try {
         const dedupKey = `dedup:${req.originalUrl}:${JSON.stringify(req.body)}`;
@@ -37,7 +49,13 @@ export const deduplicator = async (req, res, next) => {
     }
 };
 
-// Cleanup deduplication key after the response
+/**
+ * This is middleware cleanup deduplication key after the response
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns [] 401 if invalid otherwise pass to API handler
+ */
 export const cleanupDedupKey = async (req, res, next) => {
     try {
         res.on("finish", () => {

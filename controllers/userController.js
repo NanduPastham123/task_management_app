@@ -2,6 +2,12 @@ import User from '../models/user.js';
 import { AppError, errorHandler } from  '../middlewares/errorHandler.js';
 import logger from '../utils/logger.js'; // Import the logger
 
+/**
+ * @description create a new user
+ * @param {*} req
+ * @param {*} res
+ * @method POST/createNewRegistrationForUser
+ */
 export const createNewRegistrationForUser = async (req, res, next) => {
     try {
         // Extract request details
@@ -27,6 +33,11 @@ export const createNewRegistrationForUser = async (req, res, next) => {
     }
 };
 
+/**
+ * @description get all users based on Admin login without pagination
+ * @param {*} res
+ * @method GET/getAllUsers
+ */
 export const getAllUsers = async (req, res) => {
     try {
         logger.info('Fetching all users'); 
@@ -40,6 +51,12 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
+/**
+ * @description get all users based on Admin login with pagination
+ * @param {*} req
+ * @param {*} res 
+ * @method GET/getAllUsersWithPagination
+ */
 export const getAllUsersWithPagination = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
@@ -65,7 +82,12 @@ export const getAllUsersWithPagination = async (req, res) => {
     }
 };
 
-
+/**
+ * @description generate a token based login credentials for role admin or user
+ * @param {*} req
+ * @param {*} res 
+ * @method POST/generateTokenForLoggedInUser
+ */
 export const generateTokenForLoggedInUser = async (req, res) => {
     try {
         logger.info('User attempting to generate token'); // Log when a token generation request is received

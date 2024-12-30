@@ -1,6 +1,11 @@
-import logger from '../utils/logger.js'; // Import the logger
-
-// Custom error class for operational errors
+import logger from '../utils/logger.js'; 
+/**
+ * Custom error class for operational errors
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns [] 401 if invalid otherwise pass to API handler
+ */
 export class AppError extends Error {
     constructor(message, statusCode) {
         super(message);
@@ -10,7 +15,13 @@ export class AppError extends Error {
     }
 }
 
-// Centralized error-handling middleware
+/**
+ * Centralized error-handling middleware
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns [] 401 if invalid otherwise pass to API handler
+ */
 export const errorHandler = (err, req, res, next) => {
     const { statusCode = 500, status = 'error', message } = err;
 

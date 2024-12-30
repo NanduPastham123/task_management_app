@@ -3,7 +3,10 @@ import Task from '../models/task.js';
 import { AppError } from '../middlewares/errorHandler.js';  // Import the custom AppError class
 import logger from '../utils/logger.js'; // Assuming your logger is set up properly
 
-
+/**
+ * @description add a new comment to a task
+ * @method POST/addCommentToTask
+ */
 export const addCommentToTask = async (req, res, next) => {
     try {
         const { content } = req.body;

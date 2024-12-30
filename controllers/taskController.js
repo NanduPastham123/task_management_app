@@ -2,6 +2,12 @@ import Task from '../models/task.js';  // Import Task as the default export
 import logger from '../utils/logger.js';
 import { AppError, errorHandler } from  '../middlewares/errorHandler.js';
 
+/**
+ * @description create a new task based on user
+ * @param {*} req
+ * @param {*} res 
+ * @method POST/createNewUserTask
+ */
 export const createNewUserTask = async (req, res) => {
     try {
         // Extract data from the request body
@@ -39,6 +45,11 @@ export const createNewUserTask = async (req, res) => {
     }
 };
 
+/**
+ * @description get all tasks based on Admin login without pagination
+ * @param {*} res  
+ * @method GET/getAllTasks
+ */
 export const getAllTasks = async (req, res) => {
     try {
         logger.info('Fetching all tasks');  // Log when the request to fetch all tasks is made
@@ -54,6 +65,12 @@ export const getAllTasks = async (req, res) => {
     }
 };
 
+/**
+ * @description get all tasks based on Admin login with pagination 
+ * @param {*} req
+ * @param {*} res 
+ * @method GET/getAllTasksWithPagination
+ */
 export const getAllTasksWithPagination = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
@@ -79,7 +96,12 @@ export const getAllTasksWithPagination = async (req, res) => {
     }
 };
 
-
+/**
+ * @description update a new task based on user
+ * @param {*} req
+ * @param {*} res 
+ * @method POST/updateTask
+ */
 export const updateTask = async (req, res) => {
     try {
         const { id } = req.params;
@@ -111,6 +133,12 @@ export const updateTask = async (req, res) => {
     }
 };
 
+/**
+ * @description delete a task based on user
+ * @param {*} req
+ * @param {*} res 
+ * @method DELETE/deleteTask
+ */
 export const deleteTask = async (req, res) => {
     try {
         const { id } = req.params;
@@ -132,7 +160,12 @@ export const deleteTask = async (req, res) => {
     }
 };
 
-
+/**
+ * @description get a task based on unique task with filtering and pagination
+ * @param {*} req
+ * @param {*} res
+ * @method GET/getTasksWithCommentsById
+ */
 export const getTasksWithCommentsById = async (req, res) => {
     try {
         const { id } = req.params;
