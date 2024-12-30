@@ -26,6 +26,7 @@ export const getAllUsers = async (req, res) => {
 
 export const getAllUsersWithPagination = async (req, res) => {
     try {
+        console.log('comeshere')
         const { page = 1, limit = 10 } = req.query;
         const users = await User.find()
             .skip((page - 1) * limit)  // Skip users based on page number
